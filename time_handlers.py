@@ -12,20 +12,21 @@ def timer_create_entry_handler(syscall_id, syscall_object, pid):
         logging.debug("Sigevent type: " + str(sigev_type))
 
         if sigev_type != 'SIGEV_NONE':
-            logging.debug("Sigevent type %s is not supported" % (sigev_type))
-            logging.debug("Letting system call through")
-            return
-        
-        addr = cint.peek_register(pid, cint.EDX)
-        logging.debug('timerid address: %x', addr)
+            logging.debug("Sigevent type %s cannot be replayed directly" % (sigev_type))
+            logging.debug("Letting timer_create call through")
+        else:
+            # addr
+            addr = cint.peek_register(pid, cint.EDX)
+            logging.debug('timerid address: %x', addr)
 
-        timerid = int(syscall_object.args[-1].value.strip('{}'))
-        logging.debug(str(timerid))
+            # timerid
+            timerid = int(syscall_object.args[-1].value.strip('{}'))
+            logging.debug(str(timerid))
 
-        cint.populate_timer_t_structure(pid, addr, timerid);
-        
-        noop_current_syscall(pid)
-        apply_return_conditions(pid, syscall_object)
+            cint.populate_timer_t_structure(pid, addr, timerid);
+
+            noop_current_syscall(pid)
+            apply_return_conditions(pid, syscall_object)
 
 
 def timer_create_exit_handler(syscall_id, syscall_object, pid):
