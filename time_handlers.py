@@ -12,7 +12,9 @@ def timer_create_entry_handler(syscall_id, syscall_object, pid):
         logging.debug("Sigevent type: " + str(sigev_type))
 
         if sigev_type != 'SIGEV_NONE':
-            raise NotImplementedError("Sigevent type %s is not supported" % (sigev_type))
+            logging.debug("Sigevent type %s is not supported" % (sigev_type))
+            logging.debug("Letting system call through")
+            return
         
         addr = cint.peek_register(pid, cint.EDX)
         logging.debug('timerid address: %x', addr)
@@ -24,6 +26,11 @@ def timer_create_entry_handler(syscall_id, syscall_object, pid):
         
         noop_current_syscall(pid)
         apply_return_conditions(pid, syscall_object)
+
+
+def timer_create_exit_handler(syscall_id, syscall_object, pid):
+    logging.debug("Entering the timer_create exit handler")
+    logging.debug("Nothing to do here")
 
 
 def timer_extract_and_populate_itimerspec(syscall_object, pid, addr, start_index):
