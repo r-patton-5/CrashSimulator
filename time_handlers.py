@@ -12,8 +12,7 @@ def timer_create_entry_handler(syscall_id, syscall_object, pid):
         logging.debug("Sigevent type: " + str(sigev_type))
 
         if sigev_type != 'SIGEV_NONE':
-            logging.debug("Sigevent type %s cannot be replayed directly" % (sigev_type))
-            logging.debug("Letting timer_create call through")
+            raise NotImplementedError("Sigevent type %s is not supported for timer_create" % (sigev_type))
         else:
             # addr
             addr = cint.peek_register(pid, cint.EDX)
